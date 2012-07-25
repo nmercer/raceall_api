@@ -8,10 +8,23 @@ from bcrypt import hashpw, gensalt
 from database.db import Database
 from bson.objectid import ObjectId
 from bson.code import Code
+from validatish import validate
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.set_header("Content-Type", "application/json")
+
+    def validate_id(self, val):
+        try:
+            validate.is_plaintext(val)
+        except:
+            raise tornado.web.HTTPError(400)
+
+    def validate_time(self, val):
+        try:     
+            validate.is_integer(val)
+        except:
+            raise tornado.web.HTTPError(400)
 
     def jsoncheck(self, request):
         try:
@@ -59,8 +72,7 @@ class BaseHandler(tornado.web.RequestHandler):
                                                   friend_id = user_id))
         if friend_data and user_data:
             return True
-
-        raise tornado.web.HTTPError(403)
+        return False
 
     def race_user_check(self, user_id, race_id):
         db = Database()
@@ -85,9 +97,25 @@ class BaseHandler(tornado.web.RequestHandler):
             return True
         return False
 
-    #def map(race_id):
-    #    mapper = Code("""
-    #                  function () {
-    #                    this.races.forEach(function(z) {
-    #                    
-    #                """)
+#    def tester(self, race_id):
+#        mapper = Code("""
+#                      function () {
+#                        this.user_id.forEach(function(z) {
+#                          emit(z, 1);
+#                        });
+#                    """)
+#
+#        reducer = Code("""
+#                       function(key, values) {
+#                         var total = 0;
+#                         for (var i = 0; i < values.length; i++) {
+#                           total += values[i];
+#                         }
+#                         return total;
+#                       }
+#                      """)
+#        db = Database().connect()
+#        result = db.races.map_reduce(mapper, reducer, "myresults")
+#        db.close()
+#
+#        return result

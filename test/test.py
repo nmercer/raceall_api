@@ -90,7 +90,7 @@ def testFull():
     payload = dict(name="race0",
                    vehicle="Cars",
                    description="race0",
-                   private=False,
+                   private=True,
                    time=160)
     jdata = json.dumps(payload)
     r = requests.post(url, data=jdata, headers=headers)
@@ -104,11 +104,11 @@ def testFull():
 
     race_data = r.json['0']
 
-    #print "Get Race Data"
-    #url = "http://localhost:8888/race/" + race_data + '/'
-    #headers = {'Authorization': data['user2']['token']}
-    #r = requests.get(url, data=None, headers=headers)
-    #print r.json
+    print "Get Race Data"
+    url = "http://localhost:8888/race/" + race_data + '/'
+    headers = {'Authorization': data['user1']['token']}
+    r = requests.get(url, data=None, headers=headers)
+    print r.json
 
     #print "Delete Entire Race"
     #url = "http://localhost:8888/race/" + race_data + '/'
@@ -124,13 +124,37 @@ def testFull():
     print "Add yourslef to race"
     url = "http://localhost:8888/race/" + race_data + '/user/'
     headers = {'Authorization': data['user1']['token']}
-    #payload = dict(friend_id=id_data['user0'])
-    payload = {}
+    payload = dict(friend_id=id_data['user0'])
+    #payload = {}
     jdata = json.dumps(payload)
     r = requests.post(url, data=jdata, headers=headers)
 
+    #print "Delete Race User Data"
+    #url = "http://localhost:8888/race/" + race_data + '/user/'
+    #headers = {'Authorization': data['user1']['token']}
+    #r = requests.delete(url, data=None, headers=headers)
+    #print r.json
+
+    print "Get Race User Data"
+    url = "http://localhost:8888/race/" + race_data + '/user/'
+    headers = {'Authorization': data['user0']['token']}
+    r = requests.get(url, data=None, headers=headers)
+    print r.json
+
+    print "Create Race Times"
+    url = "http://localhost:8888/race/" + race_data + '/time/'
+    headers = {'Authorization': data['user0']['token']}
+    for time in [9999, 1234, 4321, 1111, 2222, 3333, 20, 20, 15, 999999]:
+        payload = dict(time=time)
+        jdata = json.dumps(payload)
+        r = requests.post(url, data=jdata, headers=headers)
+
+    print "Get Race Times"
+    url = "http://localhost:8888/race/" + race_data + '/time/'
+    headers = {'Authorization': data['user0']['token']}
+    r = requests.get(url, data=None, headers=headers)
+    print r.json
 
 
-    
 
 testFull()
