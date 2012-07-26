@@ -8,12 +8,12 @@ from bcrypt import hashpw
 class LoginHandler(BaseHandler):
     @tornado.web.addslash
     def post(self):
+        self.db = Database()
         data = self.jsoncheck(self.request.body)
 
         #XXX: Validation
 
-        db = Database()
-        user_data = db.select_one('users', dict(username=data['username']))
+        user_data = self.db.select_one('users', dict(username=data['username']))
 
         if user_data and hashpw(data['password'], user_data['password']) == user_data['password']:
             self.token_new(data['username'])

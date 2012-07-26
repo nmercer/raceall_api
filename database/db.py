@@ -9,75 +9,32 @@ class Database():
         self.host = config.parser['database']['host']
         self.port = int(config.parser['database']['port'])
         self.db_name = config.parser['database']['name']
+        self.conn = Connection(self.host, self.port)
+        self.db = self.conn[self.db_name]
 
     def insert(self, collection=None, *args):
         if collection:
-            #Connect
-            conn = Connection(self.host, self.port)
-            db = conn[self.db_name]
-
-            #Work
-            data = db[collection].insert(args[0])
-
-            #Disconnect
-            conn.disconnect()
-            return data
+            return self.db[collection].insert(args[0])
 
     def select(self, collection=None, *args):
         if collection:
-            #Connect
-            conn = Connection(self.host, self.port)
-            db = conn[self.db_name]
-
-            #Work
-            data = db[collection].find(args[0])
-
-            #Disconnect
-            conn.disconnect()
-            return data
+            return self.db[collection].find(args[0])
 
     def select_one(self, collection=None, *args):
         if collection:
-            #Connect
-            conn = Connection(self.host, self.port)
-            db = conn[self.db_name]
-
-            #Work
-            data = db[collection].find_one(args[0])
-
-            #Disconnect
-            conn.disconnect()
-            return data
-
+            return self.db[collection].find_one(args[0])
 
     def delete(self, collection=None, *args):
         if collection:
-            #Connect
-            conn = Connection(self.host, self.port)
-            db = conn[self.db_name]
-
-            #Work
-            data = db[collection].remove(args[0])
-
-            #Disconnect
-            conn.disconnect()
-            return data
-
+            return self.db[collection].remove(args[0])
 
     def update(self, collection=None, *args):
         if collection:
-            #Connect
-            conn = Connection(self.host, self.port)
-            db = conn[self.db_name]
+            return self.db[collection].update(args[0])
 
-            #Work
-            data = db[collection].update()
-
-            #Disconnect
-            conn.disconnect()
-            return data
+    def close(self):
+        self.conn.disconnect()
 
     #Return database cursor
     def connect(self):
         return Connection(self.host, self.port)
-

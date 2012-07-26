@@ -9,16 +9,15 @@ class FriendInfoHandler(BaseHandler):
     @tornado.web.addslash
     def get(self, friend_id):
         #XXX: Validation
+        self.db = Database()
 
         token = self.request.headers.get('Authorization', 'http')
         user_id = self.token_check(token)
 
-        db = Database()
-
         friend_id = ObjectId(friend_id)
         self.friend_check(user_id, friend_id)
 
-        friend_data = db.select('users', dict(_id, friend_id))
+        friend_data = self.db.select('users', dict(_id, friend_id))
         #XXX: Get data needed and return
         
 

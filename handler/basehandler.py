@@ -36,25 +36,24 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write(json.dumps(data))
 
     def token_new(self, username):
-        db = Database()
-
-        user_data = db.select_one('users', dict(username=username))
+        self.db = Database()
+        user_data = self.db.select_one('users', dict(username=username))
 
         #Check if user already has token
-        token = db.select_one('tokens', dict(users_id=user_data['_id']))
+        token = self.db.select_one('tokens', dict(users_id=user_data['_id']))
         if token:
             self.dict_to_json(dict(token = token['token']))
         else:
             token = base64.b64encode(OpenSSL.rand.bytes(16))
-            db.insert('tokens', dict(users_id=user_data['_id'],
+            self.db.insert('tokens', dict(users_id=user_data['_id'],
                                      token=token,
                                      created=datetime.datetime.utcnow()))
 
             self.write(dict(token = token))
 
     def token_check(self, token):
-        db = Database()
-        token_data = db.select_one('tokens', dict(token=token))
+        self.db = Database()
+        token_data = self.db.select_one('tokens', dict(token=token))
 
         if token_data:
             return ObjectId(token_data['users_id'])
@@ -65,37 +64,42 @@ class BaseHandler(tornado.web.RequestHandler):
         return hashpw(password, gensalt())
 
     def friend_check(self, user_id, friend_id):
-        db = Database()
-        friend_data = db.select_one('friends', dict(user_id = user_id,
+        self.db = Database()
+        friend_data = self.db.select_one('friends', dict(user_id = user_id,
                                                     friend_id = friend_id))
-        user_data = db.select_one('friends', dict(user_id = friend_id,
+        user_data = self.db.select_one('friends', dict(user_id = friend_id,
                                                   friend_id = user_id))
         if friend_data and user_data:
             return True
         return False
 
     def race_user_check(self, user_id, race_id):
-        db = Database()
-        if db.select_one('race_user', dict(user_id = user_id,
+        self.db = Database()
+        if self.db.select_one('race_user', dict(user_id = user_id,
                                            race_id = race_id)):
             return True
         return False
 
     def race_owner_check(self, user_id, race_id):
-        db = Database()
-        if db.select_one('races', dict(user_id = user_id,
+        self.db = Database()
+        if self.db.select_one('races', dict(user_id = user_id,
                                        _id = race_id)):
 
             return True
         return False
 
     def race_public_check(self, race_id):
-        db = Database()
-        if db.select_one('races', dict(private = False,
+        self.db = Database()
+        if self.db.select_one('races', dict(private = False,
                                        _id = race_id)):
 
             return True
         return False
+
+    def on_finish(self):
+        print "Close Connection"
+        self.db.close()
+
 
 #    def tester(self, race_id):
 #        mapper = Code("""

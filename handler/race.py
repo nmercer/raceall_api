@@ -14,6 +14,7 @@ class RaceHandler(BaseHandler):
 
     def get(self, race_id):
         race_data = self.db.select_one('races', dict(_id=ObjectId(race_id)))
+
         owner_id = race_data['user_id']
 
         if self.race_public_check(ObjectId(race_id)) or owner_id == self.user_id or self.friend_check(self.user_id, owner_id):
@@ -46,7 +47,6 @@ class RaceHandler(BaseHandler):
 
         self.db.insert('race_user', dict(user_id = self.user_id,
                                          race_id = ObjectId(race_id)))
-
     def put(self, race_id):
         data = self.jsoncheck(self.request.body)
 
@@ -56,7 +56,7 @@ class RaceHandler(BaseHandler):
         owner_id = race_data['user_id']
         if owner_id == self.user_id:
             #XXX: Need to create update method
-            db.update('races')
+            self.db.update('races')
             #XXX: If updating GPS data will need to unpack and update gps
         else:
             raise tornado.web.HTTPError(403)
@@ -143,7 +143,6 @@ class RaceTimeHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def get(self, race_id):
         #Validate input
@@ -195,7 +194,6 @@ class RaceGpsHandler(BaseHandler):
     def initialize(self, race_id):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def get(self):
         pass
