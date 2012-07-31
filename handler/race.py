@@ -108,20 +108,6 @@ class RaceUserHandler(BaseHandler):
         self.user_id = self.token_check(token)
         self.db = Database()
 
-    def get(self, race_id):
-        race_id = ObjectId(race_id)
-
-        if not self.race_user_check(self.user_id, race_id):
-            raise tornado.web.HTTPError(403)
-
-        race_data = self.db.select('race_user', dict(race_id = race_id))
-
-        users = {}
-        for idx,user in enumerate(race_data):
-            users[idx] = str(user['user_id'])
-
-        self.write(users)
-
     def post(self, race_id):
         #Check JSON
         data = self.jsoncheck(self.request.body)
@@ -158,22 +144,6 @@ class RaceTimeHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-
-    #def get(self, race_id):
-    #    race_id = ObjectId(race_id)
-    #
-    #    #Check Data
-    #    if self.race_user_check(self.user_id, race_id):
-    #        race_data = self.db.select('race_time', dict(race_id = race_id))
-    #        times = sorted([x['time'] for x in race_data])
-    #
-    #        data = {}
-    #        for idx,time in enumerate(times):
-    #            data[idx] = time
-    # 
-    #        self.write(data)
-    #    else:
-    #        raise tornado.web.HTTPError(403)
 
     def post(self, race_id):
         #Validate input

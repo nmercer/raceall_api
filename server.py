@@ -22,20 +22,11 @@ if __name__ == "__main__":
         (r'/friend/',                        FriendsHandler),
         (r'/friend/([0-9A-Za-z]+)/',         FriendHandler),
 
-        #(r'/user/friend/',                   UserFriendHandler),
-        #(r'/user/friend/([0-9A-Za-z]+)/',    UserFriendHandler),
-        #(r'/user/races/',                    UserRaceHandler),
-        #(r'/user/info/',                     UserInfoHandler),
-
         (r'/race/',                          RaceHandler),
         (r'/race/([0-9A-Za-z]+)/',           RaceHandler),
         (r'/race/([0-9A-Za-z]+)/user/',      RaceUserHandler),
         (r'/race/([0-9A-Za-z]+)/time/',      RaceTimeHandler),
         (r'/race/([0-9A-Za-z]+)/gps/',       RaceGpsHandler),
-        #(r'/race/([0-9A-Za-z]+)/info/',      RaceInfoHandler),
-
-        #(r'/friend/info/([0-9A-Za-z]+)/',    FriendInfoHandler),
-        #(r'/friend/race/([0-9A-Za-z]+)/',    FriendRaceHandler)
 
     ], debug = True)
 

@@ -44,52 +44,6 @@ class UsersHandler(BaseHandler):
                                      password=pw_crypt,
                                      created=datetime.datetime.utcnow()))
 
-class UserFriendHandler(BaseHandler):
-    @tornado.web.addslash
-    def initialize(self):
-        token = self.request.headers.get('Authorization', 'http')
-        self.user_id = self.token_check(token)
-        self.db = Database()
-
-    def get(self):
-        friend_data = self.db.select('friends', dict(user_id=self.user_id))
-
-        #XXX: Validation
-
-        friends = {}
-        for idx,friend in enumerate(friend_data):
-            if self.db.select_one('friends', dict(user_id=friend['friend_id'],
-                                                  friend_id=self.user_id)):
-                friends[idx] = str(friend['friend_id'])
-
-        self.write(friends)
-
-    def post(self, friend_id):
-        friend_id = ObjectId(friend_id)
-
-        #XXX: Validation
-
-        has_user = self.db.select_one('users', dict(_id = friend_id))
-        has_friend = self.db.select_one('friends', dict(user_id = self.user_id,
-                                                        friend_id = friend_id))
-        if has_user and not has_friend:
-            self.db.insert('friends', dict(user_id = self.user_id,
-                                           friend_id = friend_id))
-
-    def delete(self, friend_id):
-        friend_id = ObjectId(friend_id)
-
-        #XXX: Validation
-
-        self.db.delete('friends', dict(user_id = self.user_id,
-                                       friend_id = friend_id))
-
-class UserInfoHandler(BaseHandler):
-    @tornado.web.addslash
-    def initialize(self, race_id):
-        token = self.request.headers.get('Authorization', 'http')
-        self.user_id = self.token_check(token)
-        self.db = Database()
 
 class UserRaceHandler(BaseHandler):
     @tornado.web.addslash
@@ -127,4 +81,3 @@ class UserRaceHandler(BaseHandler):
             race_data[idx] = race
 
         self.write(race_data) 
-
