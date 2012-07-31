@@ -28,6 +28,7 @@ def testFull():
     data['user3'] = dict(username="user3")
     data['user4'] = dict(username="user4")
 
+    print "-------------------------------------------"
     print "Create Users"
     headers = {'content-type': 'application/json'}
     url = "http://localhost:8888/user/"
@@ -39,6 +40,7 @@ def testFull():
         jdata = json.dumps(payload)
         r = requests.post(url, data=jdata, headers=headers)
 
+    print "-------------------------------------------"
     print "Login Users"
     headers = {'content-type': 'application/json'}
     url = "http://localhost:8888/user/login/"
@@ -50,40 +52,44 @@ def testFull():
         r = requests.post(url, data=jdata, headers=headers)
         data[user]['token'] = r.json['token']
 
+    print "-------------------------------------------"
     print "Get all uuids"
     headers = {'content-type': 'application/json'}
     url = "http://localhost:8888/user/"
     r = requests.get(url)
     id_data = r.json
 
+    print "-------------------------------------------"
     print "Create Friendships"
     for user in ['user1', 'user3']:
-        url = "http://localhost:8888/user/friend/" + id_data[user] + '/'
+        url = "http://localhost:8888/friend/" + id_data[user] + '/'
         headers = {'Authorization': data['user0']['token']}
         r = requests.post(url, data=None, headers=headers)
 
     for user in ['user0', 'user4']:
-        url = "http://localhost:8888/user/friend/" + id_data[user] + '/'
+        url = "http://localhost:8888/friend/" + id_data[user] + '/'
         headers = {'Authorization': data['user1']['token']}
         r = requests.post(url, data=None, headers=headers)
 
+    print "-------------------------------------------"
     print "Get Friendships"
-    url = "http://localhost:8888/user/friend/"
+    url = "http://localhost:8888/friend/"
     headers = {'Authorization': data['user0']['token']}
     r = requests.get(url, data=None, headers=headers)
     print r.json
 
     #print "Delete Friendships"
-    #url = "http://localhost:8888/user/friend/" + id_data['user1'] + '/'
+    #url = "http://localhost:8888/friend/" + id_data['user1'] + '/'
     #headers = {'Authorization': data['user0']['token']}
     #r = requests.delete(url, data=None, headers=headers)
 
     #print "Get Friendships"
-    #url = "http://localhost:8888/user/friend/"
+    #url = "http://localhost:8888/friend/"
     #headers = {'Authorization': data['user0']['token']}
     #r = requests.get(url, data=None, headers=headers)
     #print r.json
 
+    print "-------------------------------------------"
     print "Create Races"
     url = "http://localhost:8888/race/"
     headers = {'Authorization': data['user0']['token']}
@@ -95,15 +101,25 @@ def testFull():
     jdata = json.dumps(payload)
     r = requests.post(url, data=jdata, headers=headers)
 
-
-    print "Get Friends Races"
-    url = "http://localhost:8888/friend/race/" + id_data['user0'] + '/'
+    print "-------------------------------------------"
+    print "Get Friendships Info"
+    url = "http://localhost:8888/friend/" + id_data['user0'] + "/"
     headers = {'Authorization': data['user1']['token']}
     r = requests.get(url, data=None, headers=headers)
     print r.json
 
-    race_data = r.json['0']
 
+    print "-------------------------------------------"
+    print "Get Friends Races"
+    url = "http://localhost:8888/friend/" + id_data['user0'] + '/'
+    headers = {'Authorization': data['user1']['token']}
+    r = requests.get(url, data=None, headers=headers)
+    print r.json
+
+    race_data = r.json['0']['race']['_id']
+
+    '''
+    print "-------------------------------------------"
     print "Get Race Data"
     url = "http://localhost:8888/race/" + race_data + '/'
     headers = {'Authorization': data['user1']['token']}
@@ -121,6 +137,9 @@ def testFull():
     #r = requests.get(url, data=None, headers=headers)
     #print r.json
 
+    '''
+
+    print "-------------------------------------------"
     print "Add yourslef to race"
     url = "http://localhost:8888/race/" + race_data + '/user/'
     headers = {'Authorization': data['user1']['token']}
@@ -135,12 +154,14 @@ def testFull():
     #r = requests.delete(url, data=None, headers=headers)
     #print r.json
 
+    print "-------------------------------------------"
     print "Get Race User Data"
     url = "http://localhost:8888/race/" + race_data + '/user/'
     headers = {'Authorization': data['user0']['token']}
     r = requests.get(url, data=None, headers=headers)
     print r.json
 
+    print "-------------------------------------------"
     print "Create Race Times"
     url = "http://localhost:8888/race/" + race_data + '/time/'
     headers = {'Authorization': data['user0']['token']}
@@ -149,12 +170,36 @@ def testFull():
         jdata = json.dumps(payload)
         r = requests.post(url, data=jdata, headers=headers)
 
-    print "Get Race Times"
+    print "-------------------------------------------"
+    print "Create Race Times"
     url = "http://localhost:8888/race/" + race_data + '/time/'
+    headers = {'Authorization': data['user1']['token']}
+    for time in [999, 134, 421, 111, 2222, 3333, 20, 20, 15, 99999]:
+        payload = dict(time=time)
+        jdata = json.dumps(payload)
+        r = requests.post(url, data=jdata, headers=headers)
+
+    #XXX: Don't think I need this
+    #print "-------------------------------------------"
+    #print "Get Race Times"
+    #url = "http://localhost:8888/race/" + race_data + '/time/'
+    #headers = {'Authorization': data['user0']['token']}
+    #r = requests.get(url, data=None, headers=headers)
+    #print r.json
+
+    print "-------------------------------------------"
+    print "Get User Race Data"
+    url = "http://localhost:8888/user/races/"
     headers = {'Authorization': data['user0']['token']}
     r = requests.get(url, data=None, headers=headers)
     print r.json
 
 
+    print "-------------------------------------------"
+    print "Get Full Race Data"
+    url = "http://localhost:8888/race/" + race_data + "/"
+    headers = {'Authorization': data['user0']['token']}
+    r = requests.get(url, data=None, headers=headers)
+    print r.json
 
 testFull()

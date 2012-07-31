@@ -26,6 +26,25 @@ class BaseHandler(tornado.web.RequestHandler):
         except:
             raise tornado.web.HTTPError(400)
 
+    def validate_name(self, val):
+        val = val.replace(' ', '')
+        try:
+            validate.is_plaintext(val)
+        except:
+            raise tornado.web.HTTPError(400)
+
+    def validate_string(self, val):
+        try:
+            validate.is_string(val)
+        except:
+            raise tornado.web.HTTPError(400)
+
+    def validate_bool(self, val):
+        try:
+            validate.is_one_of(val, [True, False])
+        except:
+            raise tornado.web.HTTPError(400)
+
     def jsoncheck(self, request):
         try:
             return tornado.escape.json_decode(request)
@@ -92,34 +111,8 @@ class BaseHandler(tornado.web.RequestHandler):
         self.db = Database()
         if self.db.select_one('races', dict(private = False,
                                        _id = race_id)):
-
             return True
         return False
 
     def on_finish(self):
-        print "Close Connection"
         self.db.close()
-
-
-#    def tester(self, race_id):
-#        mapper = Code("""
-#                      function () {
-#                        this.user_id.forEach(function(z) {
-#                          emit(z, 1);
-#                        });
-#                    """)
-#
-#        reducer = Code("""
-#                       function(key, values) {
-#                         var total = 0;
-#                         for (var i = 0; i < values.length; i++) {
-#                           total += values[i];
-#                         }
-#                         return total;
-#                       }
-#                      """)
-#        db = Database().connect()
-#        result = db.races.map_reduce(mapper, reducer, "myresults")
-#        db.close()
-#
-#        return result

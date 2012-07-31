@@ -99,6 +99,32 @@ class UserRaceHandler(BaseHandler):
         self.db = Database()
 
     def get(self):
-        pass
-        #XXX: Return ID's
-        #self.write(
+        race_list = []
+        races = self.db.select('race_user', dict(user_id=self.user_id))
+        for race in races:
+            race_data = self.db.select_one('races', dict(_id = race['race_id']))
+            race_data = dict(_id = str(race_data['_id']),
+                             name = race_data['name'],
+                             vehicle = race_data['vehicle'],
+                             private = race_data['private'])
+
+            times = self.db.select('race_time', dict(race_id = race['race_id']))
+            user_times = sorted([[x['time'],x['user_id']] for x in times])[-5:]
+
+            time_data = {}
+            for idx,time in enumerate(user_times):
+                name = self.db.select_one('users', dict(_id=time[1]))['username']
+                time_data[idx] = dict(time = time[0],
+                                      user_id = str(time[1]),
+                                      name = name)
+
+
+            race_list.append(dict(times = time_data,
+                                      race = race_data))
+
+        race_data = {}
+        for idx,race in enumerate(race_list):
+            race_data[idx] = race
+
+        self.write(race_data) 
+
