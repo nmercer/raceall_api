@@ -11,7 +11,6 @@ class RaceHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def get(self, race_id):
         race_id = ObjectId(race_id)
@@ -72,7 +71,6 @@ class RaceHandler(BaseHandler):
         race_data = self.db.select_one('races', dict(_id=ObjectId(race_id)))
         owner_id = race_data['user_id']
         if owner_id == self.user_id:
-            #XXX: Need to create update method
             self.db.update('races')
             #XXX: If updating GPS data will need to unpack and update gps
         else:
@@ -98,7 +96,6 @@ class RaceUserHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def post(self, race_id):
         data = Validate(self.request.body).new_race_user()

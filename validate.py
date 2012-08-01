@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 import tornado.web
+import tornado.httpserver
 
 from pymongo import Connection
 from config.parser import Config
@@ -10,7 +10,10 @@ class Validate():
         try:
             self.data = tornado.escape.json_decode(data)
         except ValueError:
-            raise tornado.web.HTTPError(400)
+            raise tornado.httpserver._BadRequestException("Invalid JSON structure.")
+
+        if type(self.data) != dict:
+            raise tornado.httpserver._BadRequestException("Invalid key value objects")
 
     def new_user(self):
         errors = dict(username=[], password=[])

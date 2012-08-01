@@ -9,7 +9,6 @@ from validate import Validate
 class LoginHandler(BaseHandler):
     @tornado.web.addslash
     def post(self):
-        self.db = Database()
         data = Validate(self.request.body).login()
 
         user_data = self.db.select_one('users', dict(username=data['username']))

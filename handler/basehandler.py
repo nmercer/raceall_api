@@ -11,10 +11,9 @@ from bson.code import Code
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
-        self.set_header("Content-Type", "application/json")
+        self.db = Database()
 
     def token_new(self, username):
-        self.db = Database()
         user_data = self.db.select_one('users', dict(username=username))
 
         #Check if user already has token
@@ -31,6 +30,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def token_check(self, token):
         self.db = Database()
+
         token_data = self.db.select_one('tokens', dict(token=token))
 
         if token_data:
@@ -42,7 +42,6 @@ class BaseHandler(tornado.web.RequestHandler):
         return hashpw(password, gensalt())
 
     def friend_check(self, user_id, friend_id):
-        self.db = Database()
         friend_data = self.db.select_one('friends', dict(user_id = user_id,
                                                     friend_id = friend_id))
         user_data = self.db.select_one('friends', dict(user_id = friend_id,
@@ -52,14 +51,12 @@ class BaseHandler(tornado.web.RequestHandler):
         return False
 
     def race_user_check(self, user_id, race_id):
-        self.db = Database()
         if self.db.select_one('race_user', dict(user_id = user_id,
                                            race_id = race_id)):
             return True
         return False
 
     def race_owner_check(self, user_id, race_id):
-        self.db = Database()
         if self.db.select_one('races', dict(user_id = user_id,
                                        _id = race_id)):
 
@@ -67,7 +64,6 @@ class BaseHandler(tornado.web.RequestHandler):
         return False
 
     def race_public_check(self, race_id):
-        self.db = Database()
         if self.db.select_one('races', dict(private = False,
                                        _id = race_id)):
             return True

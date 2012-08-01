@@ -8,9 +8,6 @@ from validate import Validate
 
 class UsersHandler(BaseHandler):
     @tornado.web.addslash
-    def initialize(self):
-        self.db = Database()
-
     def get(self):
         test = {}
         for x in self.db.select('users', {}):
@@ -31,7 +28,6 @@ class UserRaceHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def get(self):
         race_list = []

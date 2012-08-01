@@ -8,8 +8,6 @@ from bson.objectid import ObjectId
 class FriendsHandler(BaseHandler):
     @tornado.web.addslash
     def get(self):
-        self.db = Database()
-
         token = self.request.headers.get('Authorization', 'http')
         user_id = self.token_check(token)
 
@@ -34,7 +32,6 @@ class FriendHandler(BaseHandler):
     def initialize(self):
         token = self.request.headers.get('Authorization', 'http')
         self.user_id = self.token_check(token)
-        self.db = Database()
 
     def get(self, friend_id):
         friend_id = ObjectId(friend_id)
