@@ -4,6 +4,7 @@ import tornado.web
 from basehandler import BaseHandler
 from database.db import Database
 from bson.objectid import ObjectId
+from validate import Validate
 
 class UsersHandler(BaseHandler):
     @tornado.web.addslash
@@ -17,27 +18,7 @@ class UsersHandler(BaseHandler):
         self.write(test)
 
     def post(self):
-        data = self.jsoncheck(self.request.body)
-
-        user_err = []
-        pass_err = []
-
-        #XXX: Sanitize user, pw1, pw2, large lengths for username and password
-        if len(data['username']) < 4:
-            user_err.append('Username must be larger then 3 characters')
-        if len(data['password1']) < 4:
-            pass_err.append('Password must be larger then 3 characters')
-        if data['password1'] != data['password2']:
-            pass_err.append('Password\'s do not match')
-        #XXX: Maybe not the best way to test this
-        for users in self.db.select('users', dict(username=data['username'])):
-            user_err.append('Username already exists')
-
-        if user_err or pass_err:
-            self.dict_to_json(dict(user=user_err, pw=pass_err))
-            #XXX: This Needs Some Work
-            raise tornado.web.HTTPError(400)
-
+        data = Validate(self.request.body).new_user()
 
         pw_crypt = self.pw_encrpyt(data['password1'])
         self.db.insert('users', dict(username=data['username'],

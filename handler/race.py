@@ -4,6 +4,7 @@ import tornado.web
 from basehandler import BaseHandler
 from database.db import Database
 from bson.objectid import ObjectId
+from validate import Validate
 
 class RaceHandler(BaseHandler):
     @tornado.web.addslash
@@ -43,16 +44,7 @@ class RaceHandler(BaseHandler):
          
         
     def post(self):
-        #Validation
-        data = self.jsoncheck(self.request.body)
-        try:
-            name = self.validate_name(data['name'])
-            vehicle = self.validate_string(data['vehicle'])
-            description = self.validate_string(data['description'])
-            private = self.validate_bool(data['private'])
-        except KeyError:
-            raise tornado.web.HTTPError(400)
-        
+        data = Validate(self.request.body).new_race() 
 
         race_id = self.db.insert('races', dict(name=data['name'],
                                                vehicle=data['vehicle'],
@@ -75,7 +67,7 @@ class RaceHandler(BaseHandler):
     #XXX: Need update method for race data
     def put(self, race_id):
         #Validate
-        data = self.jsoncheck(self.request.body)
+        #data = self.jsoncheck(self.request.body)
 
         race_data = self.db.select_one('races', dict(_id=ObjectId(race_id)))
         owner_id = race_data['user_id']
@@ -109,10 +101,8 @@ class RaceUserHandler(BaseHandler):
         self.db = Database()
 
     def post(self, race_id):
-        #Check JSON
-        data = self.jsoncheck(self.request.body)
+        data = Validate(self.request.body).new_race_user()
 
-        #Check data
         race_id = ObjectId(race_id)
 
         if data.has_key('friend_id'):
@@ -146,12 +136,7 @@ class RaceTimeHandler(BaseHandler):
         self.user_id = self.token_check(token)
 
     def post(self, race_id):
-        #Validate input
-        data = self.jsoncheck(self.request.body)
-        try:
-            self.validate_time(data['time'])
-        except KeyError:
-           raise tornado.web.HTTPError(400)
+        data = Validate(self.request.body).new_time()
 
         race_id = ObjectId(race_id)
         if self.race_user_check(self.user_id, race_id):

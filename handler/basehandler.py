@@ -8,51 +8,10 @@ from bcrypt import hashpw, gensalt
 from database.db import Database
 from bson.objectid import ObjectId
 from bson.code import Code
-from validatish import validate
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.set_header("Content-Type", "application/json")
-
-    def validate_id(self, val):
-        try:
-            validate.is_plaintext(val)
-        except:
-            raise tornado.web.HTTPError(400)
-
-    def validate_time(self, val):
-        try:     
-            validate.is_integer(val)
-        except:
-            raise tornado.web.HTTPError(400)
-
-    def validate_name(self, val):
-        val = val.replace(' ', '')
-        try:
-            validate.is_plaintext(val)
-        except:
-            raise tornado.web.HTTPError(400)
-
-    def validate_string(self, val):
-        try:
-            validate.is_string(val)
-        except:
-            raise tornado.web.HTTPError(400)
-
-    def validate_bool(self, val):
-        try:
-            validate.is_one_of(val, [True, False])
-        except:
-            raise tornado.web.HTTPError(400)
-
-    def jsoncheck(self, request):
-        try:
-            return tornado.escape.json_decode(request)
-        except ValueError:
-            raise tornado.web.HTTPError(400)
-
-    def dict_to_json(self, data):
-        self.write(json.dumps(data))
 
     def token_new(self, username):
         self.db = Database()
@@ -61,7 +20,7 @@ class BaseHandler(tornado.web.RequestHandler):
         #Check if user already has token
         token = self.db.select_one('tokens', dict(users_id=user_data['_id']))
         if token:
-            self.dict_to_json(dict(token = token['token']))
+            self.write(dict(token = token['token']))
         else:
             token = base64.b64encode(OpenSSL.rand.bytes(16))
             self.db.insert('tokens', dict(users_id=user_data['_id'],
